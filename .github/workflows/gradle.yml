@@ -16,16 +16,24 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           
+      - name: Make gradlew executable
+        run: |
+          ls -la gradlew || echo "gradlew not found"
+          chmod +x ./gradlew || echo "Cannot chmod gradlew"
+          
       - name: Setup Chrome
         run: |
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
+          echo "Chrome version:"
           google-chrome-stable --version
           
       - name: Start application
         run: |
           java -jar artifacts/app-replan-delivery.jar &
           sleep 10
+          echo "Checking if app is running..."
+          curl -f http://localhost:9999 || echo "App not responding"
           
       - name: Run tests
         run: ./gradlew test --info -Dselenide.headless=true
